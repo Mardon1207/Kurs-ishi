@@ -1,4 +1,7 @@
 django
 gunicorn
+psycopg2
+django-filter
 djangorestframework
-djangorestframework-simplejwt
+stripe
+whitenoise
