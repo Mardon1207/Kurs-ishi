@@ -27,7 +27,7 @@ deep==0.10
 deep-translator==1.11.4
 defusedxml==0.7.1
 Django==5.0
-django-allauth==65.4.1
+django-allauth==65.1.0
 django-ckeditor==6.7.1
 django-crispy-forms==2.3
 django-filter==24.3
@@ -105,6 +105,8 @@ python-dotenv==1.0.0
 python-json-logger==2.0.7
 python-telegram-bot==22.0
 pytz==2023.3.post1
+pywin32==308
+pywinpty==2.0.14
 PyYAML==6.0.2
 pyzmq==26.2.0
 referencing==0.35.1
@@ -139,4 +141,5 @@ webcolors==24.11.1
 webencodings==0.5.1
 websocket-client==1.8.0
 Werkzeug==3.0.1
+whitenoise==6.9.0
 widgetsnbextension==4.0.13
