@@ -5,3 +5,4 @@ django-filter
 djangorestframework
 stripe
 whitenoise
+rest_framework_simplejwt
