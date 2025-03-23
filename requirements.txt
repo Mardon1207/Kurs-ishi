@@ -12,3 +12,4 @@ stripe
 requests  
 python-dotenv  
 dj-database-url 
+Pillow
