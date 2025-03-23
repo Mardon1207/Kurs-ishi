@@ -1,1 +1,1 @@
-web: gunicorn YOUR_PROJECT_NAME.wsgi --log-file -
+web: gunicorn rentapp.wsgi --log-file -
