@@ -1,13 +1,13 @@
 from rest_framework import serializers
-from django.contrib.auth.hashers import make_password
 from .models import CustomUser
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField(required=False)  # 🔹 Profil rasmi ixtiyoriy
+
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'user_type', 'phone_number']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['username', 'email', 'password', 'first_name', 'last_name', 'region', 'district', 'profile_image']
 
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data['password'])  # ✅ Parolni hash qilish
-        return super().create(validated_data)
+        user = CustomUser.objects.create_user(**validated_data)  # 🔹 create_user dan foydalanamiz
+        return user
