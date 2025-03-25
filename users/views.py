@@ -1,25 +1,34 @@
 from rest_framework import generics, serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import CustomUser
-from .serializers import UserSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from .models import CustomUser
+from .serializers import UserSerializer
 
+
+# ✅ Ro‘yxatdan o‘tish (Registratsiya)
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]  # ❗️Hamma ro‘yxatdan o‘ta olishi kerak
 
-# ✅ Login uchun JWT Token yaratish
+
+# ✅ Login qilish (JWT Token yaratish)
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        username = attrs.get("username")  # 📌 Login faqat username orqali
+        username_or_email = attrs.get("username")  # 📌 Login uchun username yoki email
         password = attrs.get("password")
 
-        user = CustomUser.objects.filter(username=username).first()
-
+        # 🔍 Avval username orqali qidiramiz
+        user = CustomUser.objects.filter(username=username_or_email).first()
+        
+        # 🔍 Agar username topilmasa, email orqali qidiramiz
+        if user is None:
+            user = CustomUser.objects.filter(email=username_or_email).first()
+        
         if user is None:
             raise serializers.ValidationError("Foydalanuvchi topilmadi!")
 
@@ -31,21 +40,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["user_type"] = user.user_type if hasattr(user, "user_type") else "default"
         return data
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+
+# ✅ Foydalanuvchi profili (User Profile API)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_profile(request):
     user = request.user
+    profile = getattr(user, 'profile', None)  # 📌 Profile mavjudligini tekshiramiz
+
     data = {
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,
         "username": user.username,
-        "phone": user.profile.phone if hasattr(user, 'profile') else None,
-        "region": user.profile.region if hasattr(user, 'profile') else None,
-        "district": user.profile.district if hasattr(user, 'profile') else None,
-        "profile_image": request.build_absolute_uri(user.profile.profile_image.url) if hasattr(user, 'profile') and user.profile.profile_image else None
+        "phone": profile.phone if profile else None,
+        "region": profile.region if profile else None,
+        "district": profile.district if profile else None,
+        "profile_image": request.build_absolute_uri(profile.profile_image.url) if profile and profile.profile_image else None
     }
     return Response(data)

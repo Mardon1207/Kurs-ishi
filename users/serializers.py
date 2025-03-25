@@ -2,20 +2,18 @@ from rest_framework import serializers
 from .models import CustomUser
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_image = serializers.ImageField(required=False)
-
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password', 'first_name', 'last_name', 'region', 'district', 'profile_image']
-        extra_kwargs = {
-            'password': {'write_only': True},  # ✅ Parolni faqat yozish mumkin
-            'email': {'required': True},  # ✅ Email majburiy maydon
-        }
+        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'password', 'user_type']
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user = CustomUser(**validated_data)
-        if password:
-            user.set_password(password)  # ✅ Parolni xavfsiz saqlash
-        user.save()
+        user = CustomUser.objects.create_user(
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            email=validated_data['email'],
+            username=validated_data['username'],
+            password=validated_data['password'],
+            user_type=validated_data.get('user_type', 'default')
+        )
         return user
