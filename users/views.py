@@ -50,16 +50,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 @permission_classes([IsAuthenticated])
 def user_profile(request):
     user = request.user
-    profile = getattr(user, 'profile', None)  # 📌 Profile mavjudligini tekshiramiz
 
     data = {
-        "first_name": user.first_name,
-        "last_name": user.last_name,
+        "first_name": user.first_name if user.first_name else None,
+        "last_name": user.last_name if user.last_name else None,
         "email": user.email,
         "username": user.username,
-        "phone": profile.phone if profile else None,
-        "region": profile.region if profile else None,
-        "district": profile.district if profile else None,
-        "profile_image": request.build_absolute_uri(profile.profile_image.url) if profile and profile.profile_image else None
+        "phone_number": user.phone_number if user.phone_number else None,
+        "region": user.region if user.region else None,
+        "district": user.district if user.district else None,
+        "profile_image": request.build_absolute_uri(user.profile_image.url) if user.profile_image else None
     }
+
     return Response(data)
